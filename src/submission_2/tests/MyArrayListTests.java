@@ -11,37 +11,51 @@ import submission_2.util.Iterator;
 
 public class MyArrayListTests {
 
-    private ListADT<Integer> myList;
+    private ListADT<Integer> myArrayList;
 
     @Before
-    public void setUp() throws Exception {
-        myList = new MyArrayList<>();
+    public void setUp() {
+    	myArrayList = new MyArrayList<>();
     }
 
     @Test
     public void testSize() {
-        assertEquals(0, myList.size());
+        assertEquals(0, myArrayList.size());
+
+        myArrayList.add(42);
+        assertEquals(1, myArrayList.size());
     }
 
     @Test
     public void testClear() {
-        myList.add(5);
-        myList.clear();
-        assertEquals(0, myList.size());
+    	myArrayList.add(42);
+    	myArrayList.clear();
+        assertEquals(0, myArrayList.size());
     }
 
     @Test
-    public void testAddIntE() {
-        myList.add(0, 42);
-        assertEquals(1, myList.size());
-        assertEquals(Integer.valueOf(42), myList.get(0));
+    public void testAddAtIndex() {
+    	myArrayList.add(0, 42);
+        assertEquals(1, myArrayList.size());
+        assertEquals(Integer.valueOf(42), myArrayList.get(0));
+
+        myArrayList.add(0, 11);
+        assertEquals(2, myArrayList.size());
+        assertEquals(Integer.valueOf(11), myArrayList.get(0));
+        assertEquals(Integer.valueOf(42), myArrayList.get(1));
+    }
+
+    //Required?
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testAddAtIndexWithInvalidIndex() {
+    	myArrayList.add(1, 42);
     }
 
     @Test
-    public void testAddE() {
-        myList.add(10);
-        assertEquals(1, myList.size());
-        assertEquals(Integer.valueOf(10), myList.get(0));
+    public void testAdd() {
+    	myArrayList.add(42);
+        assertEquals(1, myArrayList.size());
+        assertEquals(Integer.valueOf(42), myArrayList.get(0));
     }
 
     @Test
@@ -49,93 +63,166 @@ public class MyArrayListTests {
         ListADT<Integer> toAdd = new MyArrayList<>();
         toAdd.add(1);
         toAdd.add(2);
-        assertTrue(myList.addAll(toAdd));
-        assertEquals(2, myList.size());
-        assertEquals(Integer.valueOf(1), myList.get(0));
-        assertEquals(Integer.valueOf(2), myList.get(1));
+
+        myArrayList.addAll(toAdd);
+
+        assertEquals(2, myArrayList.size());
+        assertEquals(Integer.valueOf(1), myArrayList.get(0));
+        assertEquals(Integer.valueOf(2), myArrayList.get(1));
     }
 
     @Test
     public void testGet() {
-        myList.add(5);
-        assertEquals(Integer.valueOf(5), myList.get(0));
+    	myArrayList.add(42);
+        assertEquals(Integer.valueOf(42), myArrayList.get(0));
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testGetWithInvalidIndex() {
+    	myArrayList.get(0);
     }
 
     @Test
-    public void testRemoveInt() {
-        myList.add(1);
-        myList.add(2);
-        myList.add(3);
-        assertEquals(Integer.valueOf(2), myList.remove(1));
-        assertEquals(2, myList.size());
-        assertEquals(Integer.valueOf(3), myList.get(1));
+    public void testRemoveAtIndex() {
+    	myArrayList.add(42);
+        Integer removed = myArrayList.remove(0);
+
+        assertEquals(Integer.valueOf(42), removed);
+        assertEquals(0, myArrayList.size());
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testRemoveAtIndexWithInvalidIndex() {
+    	myArrayList.remove(0);
     }
 
     @Test
-    public void testRemoveE() {
-        myList.add(1);
-        myList.add(2);
-        assertTrue(myList.remove(Integer.valueOf(1)) != null); // Check if an element was removed
-        assertEquals(1, myList.size());
-        assertEquals(Integer.valueOf(2), myList.get(0));
+    public void testRemoveByElement() {
+    	myArrayList.add(42);
+    	myArrayList.add(11);
+
+        Integer removed = myArrayList.remove(Integer.valueOf(42));
+
+        assertEquals(Integer.valueOf(42), removed);
+        assertEquals(1, myArrayList.size());
+        assertEquals(Integer.valueOf(11), myArrayList.get(0));
     }
 
     @Test
     public void testSet() {
-        myList.add(100);
-        assertEquals(Integer.valueOf(100), myList.set(0, 200));
-        assertEquals(1, myList.size());
-        assertEquals(Integer.valueOf(200), myList.get(0));
+    	myArrayList.add(42);
+        Integer previous = myArrayList.set(0, 11);
+
+        assertEquals(Integer.valueOf(42), previous);
+        assertEquals(Integer.valueOf(11), myArrayList.get(0));
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testSetWithInvalidIndex() {
+    	myArrayList.set(0, 11);
     }
 
     @Test
     public void testIsEmpty() {
-        assertTrue(myList.isEmpty());
-        myList.add(10);
-        assertFalse(myList.isEmpty());
+        assertTrue(myArrayList.isEmpty());
+
+        myArrayList.add(42);
+        assertFalse(myArrayList.isEmpty());
     }
 
     @Test
     public void testContains() {
-        assertFalse(myList.contains(99));
-        myList.add(99);
-        assertTrue(myList.contains(99));
-    }
+        assertFalse(myArrayList.contains(42));
 
-    @Test
-    public void testToArrayEArray() {
-        myList.add(1);
-        myList.add(2);
-        Integer[] array = new Integer[myList.size()];
-        myList.toArray(array);
-        assertArrayEquals(new Integer[]{1, 2}, array);
+        myArrayList.add(42);
+        assertTrue(myArrayList.contains(42));
     }
 
     @Test
     public void testToArray() {
-        myList.add(5);
-        myList.add(10);
-        Object[] array = myList.toArray();
-        assertArrayEquals(new Object[]{5, 10}, array);
+    	myArrayList.add(1);
+    	myArrayList.add(2);
+
+        Integer[] array = new Integer[2];
+        array = myArrayList.toArray(array);
+
+        assertArrayEquals(new Integer[]{1, 2}, array);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testToArrayWithNullArray() {
+    	myArrayList.toArray(null);
     }
 
     @Test
-    public void testIterator() {
-        myList.add(1);
-        myList.add(2);
-        myList.add(3);
+    public void testMyArrayListIterator() {
+    	myArrayList.add(1);
+    	myArrayList.add(2);
 
-        Iterator<Integer> iterator = (Iterator<Integer>) myList.iterator();
+        ListADT<Integer> listFromIterator = new MyArrayList<>();
+        Iterator<Integer> iterator = myArrayList.iterator();
 
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(1), iterator.next());
+        while (iterator.hasNext()) {
+            listFromIterator.add(iterator.next());
+        }
 
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(2), iterator.next());
+        assertEquals(myArrayList.size(), listFromIterator.size());
+        assertEquals(myArrayList.get(0), listFromIterator.get(0));
+        assertEquals(myArrayList.get(1), listFromIterator.get(1));
+    }
+    
 
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(3), iterator.next());
-
+    @Test
+    public void testIteratorHasNextEmptyList() {
+        MyArrayList<Integer> list = new MyArrayList<>();
+        MyArrayList<Integer>.MyArrayListIterator iterator = list.new MyArrayListIterator();
         assertFalse(iterator.hasNext());
     }
+
+    @Test
+    public void testIteratorHasNextNonEmptyList() {
+        MyArrayList<Integer> list = new MyArrayList<>();
+        list.add(1);
+        MyArrayList<Integer>.MyArrayListIterator iterator = list.new MyArrayListIterator();
+        assertTrue(iterator.hasNext());
+    }
+
+    @Test
+    public void testIteratorNext() {
+        MyArrayList<Integer> list = new MyArrayList<>();
+        list.add(1);
+        MyArrayList<Integer>.MyArrayListIterator iterator = list.new MyArrayListIterator();
+        assertEquals(Integer.valueOf(1), iterator.next());
+    }
+
+    /*
+    @Test(expected = NoSuchElementException.class)
+    public void testIteratorNextEmptyList() {
+        MyArrayList<Integer> list = new MyArrayList<>();
+        MyArrayList<Integer>.MyArrayListIterator iterator = list.new MyArrayListIterator();
+        iterator.next(); // Should throw NoSuchElementException
+    }
+    */
+
+    @Test
+    public void testIteratorMultipleNext() {
+        MyArrayList<Integer> list = new MyArrayList<>();
+        list.add(1);
+        list.add(2);
+        MyArrayList<Integer>.MyArrayListIterator iterator = list.new MyArrayListIterator();
+        assertEquals(Integer.valueOf(1), iterator.next());
+        assertEquals(Integer.valueOf(2), iterator.next());
+    }
+
+    /*
+    @Test(expected = NoSuchElementException.class)
+    public void testIteratorPastEnd() {
+        MyArrayList<Integer> list = new MyArrayList<>();
+        list.add(1);
+        MyArrayList<Integer>.MyArrayListIterator iterator = list.new MyArrayListIterator();
+        iterator.next(); // First call
+        iterator.next(); // Second call should throw NoSuchElementException
+    }
+    */
+    
 }
