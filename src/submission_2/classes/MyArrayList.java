@@ -7,8 +7,8 @@ import submission_2.util.Iterator;
 import submission_2.util.ListADT;
 
 public class MyArrayList<E> implements ListADT<E> {
-	
-    private int DEFAULT_CAPACITY = 10;
+
+    private static final int DEFAULT_CAPACITY = 10;
     private Object[] array;
     private int size;
 
@@ -31,14 +31,21 @@ public class MyArrayList<E> implements ListADT<E> {
     @Override
     public boolean add(int index, E toAdd) throws NullPointerException, IndexOutOfBoundsException {
         if (toAdd == null) {
-            throw new NullPointerException("Cannot add null element");
+            throw new NullPointerException("Element to add cannot be null");
         }
+
         if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException("Index out of range");
         }
 
-        ensureCapacity(size + 1);
-        System.arraycopy(array, index, array, index + 1, size - index);
+        ensureCapacity();
+
+        // Shift elements to the right
+        for (int i = size; i > index; i--) {
+            array[i] = array[i - 1];
+        }
+
+        // Insert the new element
         array[index] = toAdd;
         size++;
         return true;
@@ -47,23 +54,31 @@ public class MyArrayList<E> implements ListADT<E> {
     @Override
     public boolean add(E toAdd) throws NullPointerException {
         if (toAdd == null) {
-            throw new NullPointerException("Cannot add null element");
+            throw new NullPointerException("Element to add cannot be null");
         }
 
-        ensureCapacity(size + 1);
-        array[size++] = toAdd;
+        ensureCapacity();
+
+        array[size] = toAdd;
+        size++;
         return true;
     }
 
     @Override
     public boolean addAll(ListADT<? extends E> toAdd) throws NullPointerException {
+        if (toAdd == null) {
+            throw new NullPointerException("List to add cannot be null");
+        }
+
+        ensureCapacity(size + toAdd.size());
+
         Iterator<? extends E> iterator = toAdd.iterator();
         while (iterator.hasNext()) {
             add(iterator.next());
         }
+
         return true;
     }
-
 
     @Override
     @SuppressWarnings("unchecked")
@@ -71,6 +86,7 @@ public class MyArrayList<E> implements ListADT<E> {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index out of range");
         }
+
         return (E) array[index];
     }
 
@@ -82,9 +98,15 @@ public class MyArrayList<E> implements ListADT<E> {
         }
 
         E removedElement = (E) array[index];
-        System.arraycopy(array, index + 1, array, index, size - index - 1);
+
+        // Shift elements to the left
+        for (int i = index; i < size - 1; i++) {
+            array[i] = array[i + 1];
+        }
+
         array[size - 1] = null;
         size--;
+
         return removedElement;
     }
 
@@ -92,7 +114,7 @@ public class MyArrayList<E> implements ListADT<E> {
     @SuppressWarnings("unchecked")
     public E remove(E toRemove) throws NullPointerException {
         if (toRemove == null) {
-            throw new NullPointerException("Cannot remove null element");
+            throw new NullPointerException("Element to remove cannot be null");
         }
 
         for (int i = 0; i < size; i++) {
@@ -100,14 +122,16 @@ public class MyArrayList<E> implements ListADT<E> {
                 return remove(i);
             }
         }
+
         return null;
     }
 
     @Override
     public E set(int index, E toChange) throws NullPointerException, IndexOutOfBoundsException {
         if (toChange == null) {
-            throw new NullPointerException("Cannot set null element");
+            throw new NullPointerException("Element to set cannot be null");
         }
+
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index out of range");
         }
@@ -126,7 +150,7 @@ public class MyArrayList<E> implements ListADT<E> {
     @SuppressWarnings("unchecked")
     public boolean contains(E toFind) throws NullPointerException {
         if (toFind == null) {
-            throw new NullPointerException("Cannot search for null element");
+            throw new NullPointerException("Element to find cannot be null");
         }
 
         for (int i = 0; i < size; i++) {
@@ -134,6 +158,7 @@ public class MyArrayList<E> implements ListADT<E> {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -149,6 +174,7 @@ public class MyArrayList<E> implements ListADT<E> {
         }
 
         System.arraycopy(array, 0, toHold, 0, size);
+
         return toHold;
     }
 
@@ -159,22 +185,24 @@ public class MyArrayList<E> implements ListADT<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return new MyArrayListIterator();
+        return new MyIterator();
+    }
+
+    private void ensureCapacity() {
+        if (size == array.length) {
+            array = Arrays.copyOf(array, size * 2);
+        }
     }
 
     private void ensureCapacity(int minCapacity) {
         if (minCapacity > array.length) {
-            int newCapacity = Math.max(array.length * 2, minCapacity);
-            array = Arrays.copyOf(array, newCapacity);
+            array = Arrays.copyOf(array, minCapacity);
         }
     }
 
-    public class MyArrayListIterator implements Iterator<E> {
-        private int currentIndex;
+    private class MyIterator implements Iterator<E> {
 
-        public MyArrayListIterator() {
-            this.currentIndex = 0;
-        }
+        private int currentIndex = 0;
 
         @Override
         public boolean hasNext() {
@@ -185,9 +213,12 @@ public class MyArrayList<E> implements ListADT<E> {
         @SuppressWarnings("unchecked")
         public E next() throws NoSuchElementException {
             if (!hasNext()) {
-                throw new NoSuchElementException("No more elements in the iterator");
+                throw new NoSuchElementException("No more elements in the list");
             }
-            return (E) array[currentIndex++];
+
+            E nextElement = (E) array[currentIndex];
+            currentIndex++;
+            return nextElement;
         }
     }
 }
