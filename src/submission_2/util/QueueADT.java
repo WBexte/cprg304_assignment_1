@@ -1,6 +1,6 @@
 package submission_2.util;
 
-import exceptions.EmptyQueueException;
+import submission_2.exceptions.EmptyQueueException;
 
 import java.io.*;
 

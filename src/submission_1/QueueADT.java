@@ -3,6 +3,8 @@
  */
 package submission_1;
 
+import submission_2.util.Iterator;
+
 /**
  * 
  */
