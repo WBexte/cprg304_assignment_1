@@ -1,4 +1,4 @@
-package utilities;
+package submission_2.util;
 
 import java.util.NoSuchElementException;
 
