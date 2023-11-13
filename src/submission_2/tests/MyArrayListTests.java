@@ -158,7 +158,7 @@ public class MyArrayListTests {
         myList.add("Element 1");
         myList.add("Element 2");
 
-        String[] array = myList.toArray(new String[0]);
+        String[] array = myList.toArray(new String[myList.size()]);
         assertArrayEquals(new String[]{"Element 1", "Element 2"}, array);
     }
 

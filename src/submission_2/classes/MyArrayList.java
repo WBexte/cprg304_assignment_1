@@ -1,10 +1,6 @@
 package submission_2.classes;
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-
-import submission_2.util.Iterator;
-import submission_2.util.ListADT;
+import submission_2.util.*;
 
 public class MyArrayList<E> implements ListADT<E> {
 
@@ -24,10 +20,9 @@ public class MyArrayList<E> implements ListADT<E> {
 
     @Override
     public void clear() {
-        Arrays.fill(array, null);
         size = 0;
     }
-
+    
     @Override
     public boolean add(int index, E toAdd) throws NullPointerException, IndexOutOfBoundsException {
         if (toAdd == null) {
@@ -38,14 +33,12 @@ public class MyArrayList<E> implements ListADT<E> {
             throw new IndexOutOfBoundsException("Index out of range");
         }
 
-        ensureCapacity();
+        ensureCapacity(size + 1);  // Ensure capacity for at least size + 1 elements
 
-        // Shift elements to the right
-        for (int i = size; i > index; i--) {
-            array[i] = array[i - 1];
+        for (int i = size - 1; i >= index; i--) {
+            array[i + 1] = array[i];
         }
 
-        // Insert the new element
         array[index] = toAdd;
         size++;
         return true;
@@ -57,7 +50,7 @@ public class MyArrayList<E> implements ListADT<E> {
             throw new NullPointerException("Element to add cannot be null");
         }
 
-        ensureCapacity();
+        ensureCapacity(size + 1);  // Ensure capacity for at least size + 1 elements
 
         array[size] = toAdd;
         size++;
@@ -99,10 +92,7 @@ public class MyArrayList<E> implements ListADT<E> {
 
         E removedElement = (E) array[index];
 
-        // Shift elements to the left
-        for (int i = index; i < size - 1; i++) {
-            array[i] = array[i + 1];
-        }
+        System.arraycopy(array, index + 1, array, index, size - index - 1);
 
         array[size - 1] = null;
         size--;
@@ -170,7 +160,9 @@ public class MyArrayList<E> implements ListADT<E> {
         }
 
         if (toHold.length < size) {
-            toHold = Arrays.copyOf(toHold, size);
+            toHold = (E[]) new Object[size];
+        } else {
+            clearArray(toHold);
         }
 
         System.arraycopy(array, 0, toHold, 0, size);
@@ -180,7 +172,9 @@ public class MyArrayList<E> implements ListADT<E> {
 
     @Override
     public Object[] toArray() {
-        return Arrays.copyOf(array, size);
+        Object[] result = new Object[size];
+        System.arraycopy(array, 0, result, 0, size);
+        return result;
     }
 
     @Override
@@ -188,36 +182,53 @@ public class MyArrayList<E> implements ListADT<E> {
         return new MyIterator();
     }
 
-    private void ensureCapacity() {
-        if (size == array.length) {
-            array = Arrays.copyOf(array, size * 2);
+    private void ensureCapacity(int minCapacity) {
+        int currentCapacity = array.length;
+        if (minCapacity > currentCapacity) {
+            int newCapacity = Math.max(currentCapacity * 2, minCapacity);
+            Object[] newArray = new Object[newCapacity];
+            copyArray(array, newArray, size);
+            array = newArray;
         }
     }
 
-    private void ensureCapacity(int minCapacity) {
-        if (minCapacity > array.length) {
-            array = Arrays.copyOf(array, minCapacity);
+
+    private static void copyArray(Object[] src, Object[] dest, int length) {
+        for (int i = 0; i < length; i++) {
+            dest[i] = src[i];
+        }
+    }
+
+    private static void clearArray(Object[] array) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = null;
         }
     }
 
     private class MyIterator implements Iterator<E> {
 
         private int currentIndex = 0;
+        private boolean hasNext = true;
 
         @Override
         public boolean hasNext() {
-            return currentIndex < size;
+            return hasNext;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public E next() throws NoSuchElementException {
+        public E next() {
             if (!hasNext()) {
-                throw new NoSuchElementException("No more elements in the list");
+                throw new RuntimeException("No more elements in the list");
             }
 
             E nextElement = (E) array[currentIndex];
+
             currentIndex++;
+            if (currentIndex == size) {
+                hasNext = false;
+            }
+
             return nextElement;
         }
     }
