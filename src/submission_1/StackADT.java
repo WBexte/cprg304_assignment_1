@@ -1,7 +1,7 @@
 /**
  * 
  */
-package dataStructures;
+package submission_1;
 
 /**
  * A generic interface representing a Stack data structure.
