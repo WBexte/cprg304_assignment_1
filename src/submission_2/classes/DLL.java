@@ -5,28 +5,74 @@ import submission_2.util.ListADT;
 
 public class DLL<E> implements ListADT<E> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public MyDLLNode<E> head;
+	public MyDLLNode<E> tail;
+
 	@Override 	
 	public int size() {
 		// TODO Auto-generated method stub
-		return 0;
+		int count = 0;
+        MyDLLNode<E> curr = head;
+        while (curr != null) {
+            count++;
+            curr = curr.next;
+        }
+        return count;
 	}
 
 	@Override
 	public void clear() {
 		// TODO Auto-generated method stub
-		
+		head = null;
+		tail = null;
 	}
 
 	@Override
 	public boolean add(int index, E toAdd) throws NullPointerException, IndexOutOfBoundsException {
 		// TODO Auto-generated method stub
-		return false;
+		if (toAdd == null) {
+			throw new NullPointerException("Cannot add null element");
+		}
+		MyDLLNode<E> curr = head;
+		MyDLLNode<E> newNode = new MyDLLNode<E>(toAdd);
+		if (index < 0 || index > size()) {
+			throw new IndexOutOfBoundsException("Index out of range");
+		}
+		if (index == 0) {
+			newNode.next = head;
+			head = newNode;
+			return true;
+		}
+		for (int i = 0; i < index - 1; i++) {
+			curr = curr.next;
+		}
+		newNode.prev = curr.prev;
+		newNode.next = curr;
+		curr.prev = newNode;
+		return true;
+		
 	}
 
 	@Override
 	public boolean add(E toAdd) throws NullPointerException {
 		// TODO Auto-generated method stub
-		return false;
+		if (toAdd == null) {
+			throw new NullPointerException("Cannot add null element");
+		}
+		MyDLLNode<E> newNode = new MyDLLNode<E>(toAdd);
+		if (head == null) {
+			head = newNode;
+			tail = newNode;
+			return true;
+		}
+		tail.next = newNode;
+		newNode.prev = tail;
+		tail = newNode;
+		return true;
 	}
 
 	@Override
@@ -38,42 +84,107 @@ public class DLL<E> implements ListADT<E> {
 	@Override
 	public E get(int index) throws IndexOutOfBoundsException {
 		// TODO Auto-generated method stub
-		return null;
+		MyDLLNode<E> curr = head;
+		if (index < 0 || index > size()) {
+			throw new IndexOutOfBoundsException("Index out of range");
+		}
+		for (int i = 0; i < index; i++) {
+			curr = curr.next;
+		}
+		return curr.item;
 	}
 
 	@Override
 	public E remove(int index) throws IndexOutOfBoundsException {
 		// TODO Auto-generated method stub
-		return null;
+		MyDLLNode<E> curr = head;
+		if (index < 0 || index > size()) {
+			throw new IndexOutOfBoundsException("Index out of range");
+		}
+		if (index == 0) {
+			head = head.next;
+			head.prev = null;
+			return curr.item;
+		}
+		for (int i = 0; i < index; i++) {
+			curr = curr.next;
+		}
+		curr.prev.next = curr.next;
+		curr.next.prev = curr.prev;
+		return curr.item;
 	}
 
 	@Override
 	public E remove(E toRemove) throws NullPointerException {
 		// TODO Auto-generated method stub
+		if (toRemove == null) {
+			throw new NullPointerException("Cannot remove null element");
+		}
+		MyDLLNode<E> curr = head;
+		if (head == null) {
+			return null;
+		}
+		if (head.item.equals(toRemove)) {
+			head = head.next;
+			head.prev = null;
+			return curr.item;
+		}
+		while (curr != null) {
+			if (curr.item.equals(toRemove)) {
+				curr.prev.next = curr.next;
+				curr.next.prev = curr.prev;
+				return curr.item;
+			}
+			curr = curr.next;
+		}
 		return null;
 	}
 
 	@Override
 	public E set(int index, E toChange) throws NullPointerException, IndexOutOfBoundsException {
 		// TODO Auto-generated method stub
-		return null;
+		if (toChange == null) {
+			throw new NullPointerException("Cannot set null element");
+		}
+		MyDLLNode<E> curr = head;
+		if (index < 0 || index > size()) {
+			throw new IndexOutOfBoundsException("Index out of range");
+		}
+		if (index == 0) {
+			head.item = toChange;
+			return head.item;
+		}
+		for (int i = 0; i < index; i++) {
+			curr = curr.next;
+		}
+		curr.item = toChange;
+		return curr.item;
 	}
 
 	@Override
 	public boolean isEmpty() {
 		// TODO Auto-generated method stub
+		if (head == null) {
+			return true;
+		}
 		return false;
 	}
 
 	@Override
 	public boolean contains(E toFind) throws NullPointerException {
 		// TODO Auto-generated method stub
+		if (toFind == null) {
+			throw new NullPointerException("Cannot search for null element");
+		}
 		return false;
 	}
 
 	@Override
 	public E[] toArray(E[] toHold) throws NullPointerException {
 		// TODO Auto-generated method stub
+		if (toHold == null) {
+			throw new NullPointerException("Cannot hold null element");
+		}
 		return null;
 	}
 
