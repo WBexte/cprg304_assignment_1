@@ -78,7 +78,16 @@ public class MyDLL<E> implements ListADT<E> {
 	@Override
 	public boolean addAll(ListADT<? extends E> toAdd) throws NullPointerException {
 		// TODO Auto-generated method stub
-		return false;
+		if(toAdd == null) {
+			throw new NullPointerException("Added list cannot be null");
+		}
+		
+		Iterator<? extends E> iterator = toAdd.iterator();
+        while (iterator.hasNext()) {
+            add(iterator.next());
+        }
+
+        return true;
 	}
 
 	@Override
@@ -176,6 +185,13 @@ public class MyDLL<E> implements ListADT<E> {
 		if (toFind == null) {
 			throw new NullPointerException("Cannot search for null element");
 		}
+		MyDLLNode<E> curr = head;
+		while (curr != null) {
+			if (curr.item.equals(toFind)) {
+				return true;
+			}
+			curr = curr.next;
+		}
 		return false;
 	}
 
@@ -197,7 +213,37 @@ public class MyDLL<E> implements ListADT<E> {
 	@Override
 	public Iterator<E> iterator() {
 		// TODO Auto-generated method stub
-		return null;
+		return new MyIterator();
 	}
+	
+	private class MyIterator implements Iterator<E> {
+
+        private int currentIndex = 0;
+        private boolean hasNext = true;
+        private MyDLLNode<E> curr = head;
+
+        @Override
+        public boolean hasNext() {
+            return hasNext;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public E next() {
+			if (!hasNext()) {
+				throw new IndexOutOfBoundsException("No more elements");
+			}
+
+			E result = curr.item;
+			curr = curr.next;
+			currentIndex++;
+
+			if (curr == null) {
+				hasNext = false;
+			}
+
+			return result;
+        }
+    }
 
 }
