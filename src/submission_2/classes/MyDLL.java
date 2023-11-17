@@ -201,13 +201,28 @@ public class MyDLL<E> implements ListADT<E> {
 		if (toHold == null) {
 			throw new NullPointerException("Cannot hold null element");
 		}
-		return null;
+		int listSize = size();
+		if(toHold.length >= listSize) {
+			MyDLLNode<E> curr = head;
+			for(int i=0; i < listSize; i++) {
+				toHold[i] = curr.item;
+				curr = curr.next;
+			}
+		}
+		return toHold;
 	}
 
 	@Override
 	public Object[] toArray() {
 		// TODO Auto-generated method stub
-		return null;
+		int listSize = size();
+		Object[] arrayList = new Object[listSize];
+		MyDLLNode<E> curr = head;
+		for(int i=0; i < listSize; i++) {
+			arrayList[i] = curr.item;
+			curr = curr.next;
+		}
+		return arrayList;
 	}
 
 	@Override

@@ -6,14 +6,23 @@ import submission_2.util.StackADT;
 
 public class MyStack<E> implements StackADT<E> {
 
-    private MyArrayList<E> list;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private MyArrayList<E> list;
 
     public MyStack() {
         this.list = new MyArrayList<>();
     }
 
     public static class StackEmptyException extends RuntimeException {
-        public StackEmptyException(String message) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public StackEmptyException(String message) {
             super(message);
         }
     }
