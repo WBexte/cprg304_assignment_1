@@ -11,174 +11,206 @@ public class MyDLL<E> implements ListADT<E> {
 	private static final long serialVersionUID = 1L;
 	public MyDLLNode<E> head;
 	public MyDLLNode<E> tail;
+    private int size;
+    
+    public MyDLL() {
+        this.size = 0;
+    }
 
-	@Override 	
-	public int size() {
-		// TODO Auto-generated method stub
-		int count = 0;
-        MyDLLNode<E> curr = head;
-        while (curr != null) {
-            count++;
-            curr = curr.next;
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public void clear() {
+        head = null;
+        tail = null;
+        size = 0;
+    }
+
+    @Override
+    public boolean add(int index, E toAdd) throws NullPointerException, IndexOutOfBoundsException {
+        if (toAdd == null) {
+            throw new NullPointerException("Cannot add null element");
         }
-        return count;
-	}
 
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-		head = null;
-		tail = null;
-	}
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index out of range");
+        }
 
-	@Override
-	public boolean add(int index, E toAdd) throws NullPointerException, IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		if (toAdd == null) {
-			throw new NullPointerException("Cannot add null element");
-		}
-		MyDLLNode<E> curr = head;
-		MyDLLNode<E> newNode = new MyDLLNode<E>(toAdd);
-		if (index < 0 || index > size()) {
-			throw new IndexOutOfBoundsException("Index out of range");
-		}
-		if (index == 0) {
-			newNode.next = head;
-			head = newNode;
-			return true;
-		}
-		for (int i = 0; i < index - 1; i++) {
-			curr = curr.next;
-		}
-		newNode.prev = curr.prev;
-		newNode.next = curr;
-		curr.prev = newNode;
-		return true;
-		
-	}
+        MyDLLNode<E> newNode = new MyDLLNode<>(toAdd);
 
-	@Override
-	public boolean add(E toAdd) throws NullPointerException {
-		// TODO Auto-generated method stub
-		if (toAdd == null) {
-			throw new NullPointerException("Cannot add null element");
-		}
-		MyDLLNode<E> newNode = new MyDLLNode<E>(toAdd);
-		if (head == null) {
-			head = newNode;
-			tail = newNode;
-			return true;
-		}
-		tail.next = newNode;
-		newNode.prev = tail;
-		tail = newNode;
-		return true;
-	}
+        if (index == 0) {
+            newNode.next = head;
+            if (head != null) {
+                head.prev = newNode;
+            } else {
+                tail = newNode; // If the list is empty
+            }
+            head = newNode;
+        } else {
+            MyDLLNode<E> curr = head;
 
-	@Override
-	public boolean addAll(ListADT<? extends E> toAdd) throws NullPointerException {
-		// TODO Auto-generated method stub
-		if(toAdd == null) {
-			throw new NullPointerException("Added list cannot be null");
-		}
-		
-		Iterator<? extends E> iterator = toAdd.iterator();
+            for (int i = 0; i < index - 1; i++) {
+                curr = curr.next;
+            }
+
+            newNode.prev = curr;
+            newNode.next = curr.next;
+
+            if (curr.next != null) {
+                curr.next.prev = newNode;
+            } else {
+                tail = newNode; // If adding at the end
+            }
+
+            curr.next = newNode;
+        }
+
+        size++;
+        return true;
+    }
+
+    @Override
+    public boolean add(E toAdd) throws NullPointerException {
+        if (toAdd == null) {
+            throw new NullPointerException("Cannot add null element");
+        }
+        MyDLLNode<E> newNode = new MyDLLNode<>(toAdd);
+        if (head == null) {
+            head = newNode;
+            tail = newNode;
+        } else {
+            tail.next = newNode;
+            newNode.prev = tail;
+            tail = newNode;
+        }
+        size++;
+        return true;
+    }
+
+    @Override
+    public boolean addAll(ListADT<? extends E> toAdd) throws NullPointerException {
+        if (toAdd == null) {
+            throw new NullPointerException("Added list cannot be null");
+        }
+
+        Iterator<? extends E> iterator = toAdd.iterator();
         while (iterator.hasNext()) {
             add(iterator.next());
         }
 
         return true;
-	}
+    }
+    
+    @Override
+    public E get(int index) throws IndexOutOfBoundsException {
+        MyDLLNode<E> curr = head;
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index out of range");
+        }
+        for (int i = 0; i < index; i++) {
+            curr = curr.next;
+        }
+        return curr.item;
+    }
 
-	@Override
-	public E get(int index) throws IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		MyDLLNode<E> curr = head;
-		if (index < 0 || index > size()) {
-			throw new IndexOutOfBoundsException("Index out of range");
-		}
-		for (int i = 0; i < index; i++) {
-			curr = curr.next;
-		}
-		return curr.item;
-	}
+    @Override
+    public E remove(int index) throws IndexOutOfBoundsException {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index out of range");
+        }
 
-	@Override
-	public E remove(int index) throws IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		MyDLLNode<E> curr = head;
-		if (index < 0 || index > size()) {
-			throw new IndexOutOfBoundsException("Index out of range");
-		}
-		if (index == 0) {
-			head = head.next;
-			head.prev = null;
-			return curr.item;
-		}
-		for (int i = 0; i < index; i++) {
-			curr = curr.next;
-		}
-		curr.prev.next = curr.next;
-		curr.next.prev = curr.prev;
-		return curr.item;
-	}
+        MyDLLNode<E> curr = head;
 
-	@Override
-	public E remove(E toRemove) throws NullPointerException {
-		// TODO Auto-generated method stub
-		if (toRemove == null) {
-			throw new NullPointerException("Cannot remove null element");
-		}
-		MyDLLNode<E> curr = head;
-		if (head == null) {
-			return null;
-		}
-		if (head.item.equals(toRemove)) {
-			head = head.next;
-			head.prev = null;
-			return curr.item;
-		}
-		while (curr != null) {
-			if (curr.item.equals(toRemove)) {
-				curr.prev.next = curr.next;
-				curr.next.prev = curr.prev;
-				return curr.item;
-			}
-			curr = curr.next;
-		}
-		return null;
-	}
+        if (index == 0) {
+            head = head.next;
+            if (head != null) {
+                head.prev = null;
+            } else {
+                tail = null; // If the list is now empty
+            }
+        } else {
+            for (int i = 0; i < index; i++) {
+                curr = curr.next;
+            }
 
-	@Override
-	public E set(int index, E toChange) throws NullPointerException, IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		if (toChange == null) {
-			throw new NullPointerException("Cannot set null element");
-		}
-		MyDLLNode<E> curr = head;
-		if (index < 0 || index > size()) {
-			throw new IndexOutOfBoundsException("Index out of range");
-		}
-		if (index == 0) {
-			head.item = toChange;
-			return head.item;
-		}
-		for (int i = 0; i < index; i++) {
-			curr = curr.next;
-		}
-		curr.item = toChange;
-		return curr.item;
-	}
+            curr.prev.next = curr.next;
 
-	@Override
-	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		if (head == null) {
-			return true;
-		}
-		return false;
-	}
+            if (curr.next != null) {
+                curr.next.prev = curr.prev;
+            } else {
+                tail = curr.prev; // If removing the last element
+            }
+        }
 
+        size--;
+        return curr.item;
+    }
+
+    @Override
+    public E remove(E toRemove) throws NullPointerException {
+        if (toRemove == null) {
+            throw new NullPointerException("Cannot remove null element");
+        }
+
+        MyDLLNode<E> curr = head;
+
+        while (curr != null) {
+            if (curr.item.equals(toRemove)) {
+                if (curr.prev == null) {
+                    // If removing the first element
+                    head = curr.next;
+                    if (head != null) {
+                        head.prev = null;
+                    } else {
+                        tail = null; // If the list is now empty
+                    }
+                } else {
+                    curr.prev.next = curr.next;
+                    if (curr.next != null) {
+                        curr.next.prev = curr.prev;
+                    } else {
+                        tail = curr.prev; // If removing the last element
+                    }
+                }
+                size--;
+                return curr.item;
+            }
+            curr = curr.next;
+        }
+
+        return null;
+    }
+
+    @Override
+    public E set(int index, E toChange) throws NullPointerException, IndexOutOfBoundsException {
+        if (toChange == null) {
+            throw new NullPointerException("Cannot set null element");
+        }
+
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index out of range");
+        }
+
+        MyDLLNode<E> curr = head;
+
+        for (int i = 0; i < index; i++) {
+            curr = curr.next;
+        }
+
+        E oldValue = curr.item;
+        curr.item = toChange;
+
+        return oldValue;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+    
 	@Override
 	public boolean contains(E toFind) throws NullPointerException {
 		// TODO Auto-generated method stub
@@ -195,43 +227,40 @@ public class MyDLL<E> implements ListADT<E> {
 		return false;
 	}
 
-	@Override
-	public E[] toArray(E[] toHold) throws NullPointerException {
-		// TODO Auto-generated method stub
-		if (toHold == null) {
-			throw new NullPointerException("Cannot hold null element");
-		}
-		int listSize = size();
-		if(toHold.length >= listSize) {
-			MyDLLNode<E> curr = head;
-			for(int i=0; i < listSize; i++) {
-				toHold[i] = curr.item;
-				curr = curr.next;
-			}
-		}
-		return toHold;
-	}
+	 @Override
+	    public E[] toArray(E[] toHold) throws NullPointerException {
+	        if (toHold == null) {
+	            throw new NullPointerException("Cannot hold null element");
+	        }
+	        int listSize = size();
+	        if (toHold.length >= listSize) {
+	            MyDLLNode<E> curr = head;
+	            for (int i = 0; i < listSize; i++) {
+	                toHold[i] = curr.item;
+	                curr = curr.next;
+	            }
+	        }
+	        return toHold;
+    }
 
-	@Override
-	public Object[] toArray() {
-		// TODO Auto-generated method stub
-		int listSize = size();
-		Object[] arrayList = new Object[listSize];
-		MyDLLNode<E> curr = head;
-		for(int i=0; i < listSize; i++) {
-			arrayList[i] = curr.item;
-			curr = curr.next;
-		}
-		return arrayList;
-	}
+    @Override
+    public Object[] toArray() {
+        int listSize = size();
+        Object[] arrayList = new Object[listSize];
+        MyDLLNode<E> curr = head;
+        for (int i = 0; i < listSize; i++) {
+            arrayList[i] = curr.item;
+            curr = curr.next;
+        }
+        return arrayList;
+    }
 
-	@Override
-	public Iterator<E> iterator() {
-		// TODO Auto-generated method stub
-		return new MyIterator();
-	}
-	
-	private class MyIterator implements Iterator<E> {
+    @Override
+    public Iterator<E> iterator() {
+        return new MyIterator();
+    }
+
+    private class MyIterator implements Iterator<E> {
 
         private int currentIndex = 0;
         private boolean hasNext = true;
@@ -245,19 +274,19 @@ public class MyDLL<E> implements ListADT<E> {
         @Override
         @SuppressWarnings("unchecked")
         public E next() {
-			if (!hasNext()) {
-				throw new IndexOutOfBoundsException("No more elements");
-			}
+            if (!hasNext()) {
+                throw new IndexOutOfBoundsException("No more elements");
+            }
 
-			E result = curr.item;
-			curr = curr.next;
-			currentIndex++;
+            E result = curr.item;
+            curr = curr.next;
+            currentIndex++;
 
-			if (curr == null) {
-				hasNext = false;
-			}
+            if (curr == null) {
+                hasNext = false;
+            }
 
-			return result;
+            return result;
         }
     }
 
