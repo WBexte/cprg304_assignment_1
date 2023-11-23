@@ -1,0 +1,14 @@
+Project Status Report
+
+Date: November 25, 2023
+
+Completeness: 100% Complete
+
+Known Deficiencies/Missing Functionalities:
+- No known deficiencies/missing functionalities. 
+
+Notes:
+- All components of the assignment have been implemented and meet the requirements specified in the Assignment 2: Creating ADTs and Data Structure
+Implementations document.
+- Comprehensive JUnit tests have been provided for each module as per the requirements.
+- Documentation, including app evaluation and Javadoc, is complete and accurate.
